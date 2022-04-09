@@ -222,13 +222,17 @@ public class AbstractDAO<T> {
 
             int paramIndex = 1;
             for (Field field : t.getClass().getDeclaredFields()) {
+                field.setAccessible(true);
+                if(paramIndex == 1) {
+                    statement.setObject(t.getClass().getDeclaredFields().length + 1, field.get(t));
+                }
                 statement.setObject(paramIndex, field.get(t));
                 paramIndex++;
             }
 
             statement.executeUpdate();
         } catch (SQLException | IllegalAccessException e) {
-            LOGGER.log(Level.WARNING, type.getName() + "DAO:insert " + e.getMessage());
+            LOGGER.log(Level.WARNING, type.getName() + "DAO:update " + e.getMessage());
         } finally {
             ConnectionFactory.close(statement);
             ConnectionFactory.close(connection);

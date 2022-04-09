@@ -100,6 +100,7 @@
         <properties>
           <editable value="false"/>
           <enabled value="true"/>
+          <horizontalAlignment value="0"/>
         </properties>
       </component>
       <component id="1790b" class="javax.swing.JLabel">

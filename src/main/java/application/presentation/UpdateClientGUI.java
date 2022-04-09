@@ -42,6 +42,14 @@ public class UpdateClientGUI {
         return textFields;
     }
 
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    public JPanel getPanel1() {
+        return panel1;
+    }
+
     public JButton getExecuteButton() {
         return executeButton;
     }

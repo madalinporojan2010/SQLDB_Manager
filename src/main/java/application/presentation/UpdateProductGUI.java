@@ -33,6 +33,14 @@ public class UpdateProductGUI {
         return textFields;
     }
 
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    public JPanel getPanel1() {
+        return panel1;
+    }
+
     public JTextField getNameTextField() {
         return nameTextField;
     }

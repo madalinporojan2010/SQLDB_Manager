@@ -32,6 +32,14 @@ public class UpdateOrderGUI {
         return textFields;
     }
 
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    public JPanel getPanel1() {
+        return panel1;
+    }
+
     public JTextField getClientIdTextField() {
         return clientIdTextField;
     }

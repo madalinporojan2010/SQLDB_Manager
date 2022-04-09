@@ -41,7 +41,6 @@ public class OrderDAO extends AbstractDAO<Order> {
             if (operation == Operation.DELETE) {
                 statement.setInt(1, new ProductDAO().findById(this.findById(id).getIdProduct()).getStock() + this.findById(id).getAmmount());
             } else if (operation == Operation.INSERT) {
-                System.out.println("id="+id);
                 statement.setInt(1, new ProductDAO().findById(this.findById(id).getIdProduct()).getStock() - this.findById(id).getAmmount());
             }
             statement.setInt(2, this.findById(id).getIdProduct());

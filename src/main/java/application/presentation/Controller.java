@@ -18,7 +18,11 @@ public class Controller {
     private MainGUI mainGUI;
     private InsertIntoClientGUI insertIntoClientGUI;
     private InsertIntoProductGUI insertIntoProductGUI;
-    //private InsertIntoOrderGUI insertIntoOrderGUI;
+
+    private UpdateClientGUI updateClientGUI;
+    private UpdateProductGUI updateProductGUI;
+    private UpdateOrderGUI updateOrderGUI;
+
     private final Class clientModel = Class.forName("application.model.Client");
     private final Class productModel = Class.forName("application.model.Product");
     private final Class orderModel = Class.forName("application.model.Order");
@@ -72,6 +76,27 @@ public class Controller {
         }
     }
 
+    public void updateFields(JTable table, List<JTextField> textFields) {
+        if (table.getSelectedRow() != -1) {
+            for (int column = 0; column < table.getColumnCount(); column++) {
+                textFields.get(column).setText(table.getValueAt(table.getSelectedRow(), column).toString());
+            }
+        }
+    }
+
+    public void addActionListenersToUpdateTable(Class classBLL, Class classModel, List<JTextField> textFields, JFrame frame, JButton button) {
+        ActionListener executeButtonListener = e -> {
+            try {
+                updateObject(classBLL, classModel, textFields);
+                updateAllTables();
+                frame.dispose();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "CHECK INPUT!", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+        };
+        button.addActionListener(executeButtonListener);
+    }
+
     public void addActionListenersToMainGUI() {
         ItemListener tableBoxListener = e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -92,11 +117,26 @@ public class Controller {
         };
         ActionListener updateFromTableButtonListener = e -> {
             if (selectedTable.contains("Client")) {
-                updateObject(clientBLL, clientModel, null);
+                if (mainGUI.getClientTable().getSelectedRow() != -1) {
+                    updateClientGUI = new UpdateClientGUI();
+                    updateFields(mainGUI.getClientTable(), updateClientGUI.getTextFields());
+                    addActionListenersToUpdateTable(clientBLL, clientModel, updateClientGUI.getTextFields(), updateClientGUI.getFrame(), updateClientGUI.getExecuteButton());
+                } else
+                    JOptionPane.showMessageDialog(null, "SELECT AN ENTRY!", "ERROR", JOptionPane.INFORMATION_MESSAGE);
             } else if (selectedTable.contains("Product")) {
-                updateObject(productBLL, productModel, null);
+                if (mainGUI.getProductTable().getSelectedRow() != -1) {
+                    updateProductGUI = new UpdateProductGUI();
+                    updateFields(mainGUI.getProductTable(), updateProductGUI.getTextFields());
+                    addActionListenersToUpdateTable(productBLL, productModel, updateProductGUI.getTextFields(), updateProductGUI.getFrame(), updateProductGUI.getExecuteButton());
+                } else
+                    JOptionPane.showMessageDialog(null, "SELECT AN ENTRY!", "ERROR", JOptionPane.INFORMATION_MESSAGE);
             } else if (selectedTable.contains("Order")) {
-                updateObject(orderBLL, orderModel, null);
+                if (mainGUI.getOrderTable().getSelectedRow() != -1) {
+                    updateOrderGUI = new UpdateOrderGUI();
+                    updateFields(mainGUI.getOrderTable(), updateOrderGUI.getTextFields());
+                    addActionListenersToUpdateTable(orderBLL, orderModel, updateOrderGUI.getTextFields(), updateOrderGUI.getFrame(), updateOrderGUI.getExecuteButton());
+                } else
+                    JOptionPane.showMessageDialog(null, "SELECT AN ENTRY!", "ERROR", JOptionPane.INFORMATION_MESSAGE);
             }
             updateAllTables();
         };
@@ -129,16 +169,19 @@ public class Controller {
                 insertObject(classBLL, classModel, textFields);
                 updateAllTables();
                 frame.dispose();
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+            } catch (Exception exception) {
                 JOptionPane.showMessageDialog(null, "CHECK INPUT!", "ERROR", JOptionPane.ERROR_MESSAGE);
+                exception.printStackTrace();
             }
         };
         button.addActionListener(executeButtonListener);
     }
 
-    public static void updateObject(Class classBLL, Class classModel, List<JTextField> textFields) {
-        //Object object = setObjectProprieties(classModel, textFields);
+
+    public static void updateObject(Class classBLL, Class classModel, List<JTextField> textFields) throws Exception {
+        List<JTextField> textFieldsWithoutId = new ArrayList<>();
+        textFieldsWithoutId.addAll(textFields.subList(1, textFields.size()));
+        Object object = setObjectProprieties(classModel, textFieldsWithoutId);
         Object classBLLObject = null;
         try {
             classBLLObject = classBLL.getDeclaredConstructors()[0].newInstance();
@@ -154,8 +197,15 @@ public class Controller {
             }
         }
 
+        for (Method method : object.getClass().getDeclaredMethods()) {
+            if (method.getName().contains("setId" + object.getClass().getSimpleName())) {
+                method.invoke(object, Integer.parseInt(textFields.get(0).getText()));
+                break;
+            }
+        }
+
         try {
-            update.invoke(classBLLObject, (Object)null);
+            update.invoke(classBLLObject, object);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -178,7 +228,6 @@ public class Controller {
             order.setAmmount(ammount);
             order.setIdClient((int) tables.get(0).getModel().getValueAt(tables.get(0).getSelectedRow(), 0));
             order.setIdProduct((int) tables.get(1).getModel().getValueAt(tables.get(1).getSelectedRow(), 0));
-            System.out.println("order " + order.getIdClient() +" "+ order.getIdProduct());
             try {
                 orderBLLObj.insertOrder(order);
             } catch (NullPointerException nullPointerException) {
