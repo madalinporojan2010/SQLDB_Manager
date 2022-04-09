@@ -146,7 +146,7 @@ public class AbstractDAO<T> {
         return null;
     }
 
-    private List<T> createObjects(ResultSet resultSet) {
+    protected List<T> createObjects(ResultSet resultSet) {
         List<T> list = new ArrayList<T>();
         Constructor[] ctors = type.getDeclaredConstructors();
         Constructor ctor = null;
@@ -264,5 +264,5 @@ public class AbstractDAO<T> {
     }
     //DELETE FROM `werehousebd`.`client` WHERE (`idClient` = '2');
 
-    //SELECT * FROM werehousebd.order JOIN werehousebd.product USING (idProduct);
+    //SELECT * FROM werehousebd.order o JOIN werehousebd.product p ON (o.idProduct = p.idProduct) JOIN werehousebd.client c ON(c.idClient = o.idClient) ORDER BY c.idClient;
 }

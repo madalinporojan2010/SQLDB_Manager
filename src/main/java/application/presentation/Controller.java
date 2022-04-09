@@ -10,9 +10,11 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
+import java.io.FileNotFoundException;
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class Controller {
     private MainGUI mainGUI;
@@ -156,11 +158,23 @@ public class Controller {
             }
             updateAllTables();
         };
+        ActionListener printBillButtonListener = e -> {
+            if (selectedTable.contains("Order")) {
+                try {
+                    PrintBill.printBill();
+                    JOptionPane.showMessageDialog(null, "Bill printed succesfully!", "SUCCESS", JOptionPane.INFORMATION_MESSAGE);
+                } catch (NoSuchElementException | FileNotFoundException ex) {
+                    JOptionPane.showMessageDialog(null, "The are no orders!", "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
+
+            }
+        };
         mainGUI.getTableBox().addItemListener(tableBoxListener);
         mainGUI.getInsertButton().addActionListener(insertTableButtonListener);
         mainGUI.getUpdateButton().addActionListener(updateFromTableButtonListener);
         mainGUI.getDeleteButton().addActionListener(deleteFromTableButtonListener);
         mainGUI.getOrderButton().addActionListener(orderButtonListener);
+        mainGUI.getPrintBillButton().addActionListener(printBillButtonListener);
     }
 
     public void addActionListenersToInsertToTable(Class classBLL, Class classModel, List<JTextField> textFields, JFrame frame, JButton button) {
