@@ -1,5 +1,8 @@
 package application.presentation;
 
+import application.bll.OrderBLL;
+import application.model.Order;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionListener;
@@ -26,12 +29,16 @@ public class Controller {
 
     public Controller() throws ClassNotFoundException {
         mainGUI = new MainGUI();
-        //clientGUI = new ClientGUI();
+        changeGUI();
+        updateAllTables();
+
+        addActionListenersToMainGUI();
+    }
+
+    public void updateAllTables() {
         updateTableEntries(mainGUI.getClientTableModel(), clientBLL);
         updateTableEntries(mainGUI.getProductTableModel(), productBLL);
         updateTableEntries(mainGUI.getOrderTableModel(), orderBLL);
-
-        addActionListenersToMainGUI();
     }
 
     public void changeGUI() {
@@ -41,8 +48,9 @@ public class Controller {
         mainGUI.getProductTableLabel().setVisible(false);
         mainGUI.getOrderTableScrollPane().setVisible(false);
         mainGUI.getOrderTableLabel().setVisible(false);
-        mainGUI.getInsertButton().setEnabled(true);
-        mainGUI.getUpdateButton().setEnabled(true);
+        mainGUI.getInsertButton().setVisible(true);
+        mainGUI.getUpdateButton().setVisible(true);
+        mainGUI.getOrderButton().setVisible(false);
         mainGUI.getPrintBillButton().setVisible(false);
         mainGUI.getFrame().setSize(671, 537);
         if (selectedTable.contains("Client")) {
@@ -53,8 +61,9 @@ public class Controller {
             mainGUI.getProductTableLabel().setVisible(true);
         } else if (selectedTable.contains("Order")) {
             mainGUI.getFrame().setSize(1000, 537);
-            mainGUI.getInsertButton().setEnabled(false);
-            mainGUI.getUpdateButton().setEnabled(false);
+            mainGUI.getInsertButton().setVisible(false);
+            mainGUI.getUpdateButton().setVisible(false);
+            mainGUI.getOrderButton().setVisible(true);
             mainGUI.getPrintBillButton().setVisible(true);
             mainGUI.getClientTableScrollPane().setVisible(true);
             mainGUI.getClientTableLabel().setVisible(true);
@@ -91,24 +100,25 @@ public class Controller {
             } else if (selectedTable.contains("Order")) {
                 deleteObject(orderBLL, mainGUI.getOrderTable());
             }
+            updateAllTables();
+        };
+        ActionListener orderButtonListener = e -> {
+            if (selectedTable.contains("Order")) {
+                makeOrder(mainGUI.getTables());
+            }
+            updateAllTables();
         };
         mainGUI.getTableBox().addItemListener(tableBoxListener);
         mainGUI.getInsertButton().addActionListener(insertTableButtonListener);
         mainGUI.getDeleteButton().addActionListener(deleteFromTableButtonListener);
+        mainGUI.getOrderButton().addActionListener(orderButtonListener);
     }
 
     public void addActionListenersToInsertToTable(Class classBLL, Class classModel, List<JTextField> textFields, JFrame frame, JButton button) {
         ActionListener executeButtonListener = e -> {
             try {
                 insertObject(classBLL, classModel, textFields);
-                Method getTableModel = null;
-                for (Method method : mainGUI.getClass().getDeclaredMethods()) {
-                    if (method.getName().contains(classModel.getSimpleName() + "TableModel")) {
-                        getTableModel = method;
-                        break;
-                    }
-                }
-                updateTableEntries((DefaultTableModel) getTableModel.invoke(mainGUI), classBLL);
+                updateAllTables();
                 frame.dispose();
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
@@ -116,6 +126,35 @@ public class Controller {
             }
         };
         button.addActionListener(executeButtonListener);
+    }
+
+    public static void makeOrder(List<JTable> tables) {
+        if (tables.get(0).getSelectedRow() == -1 || tables.get(1).getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(null, "SELECT THE `CLIENT` AND THE `PRODUCT`!", "ERROR", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        Order order = new Order();
+        OrderBLL orderBLLObj = new OrderBLL();
+        int ammount = 0;
+        try {
+            String ammountString = JOptionPane.showInputDialog("Ammount:");
+            if (ammountString == null) {
+                return;
+            }
+            ammount = Integer.parseInt(ammountString);
+            order.setAmmount(ammount);
+            order.setIdClient((int) tables.get(0).getModel().getValueAt(tables.get(0).getSelectedRow(), 0));
+            order.setIdProduct((int) tables.get(1).getModel().getValueAt(tables.get(1).getSelectedRow(), 0));
+            System.out.println("order " + order.getIdClient() +" "+ order.getIdProduct());
+            try {
+                orderBLLObj.insertOrder(order);
+            } catch (NullPointerException nullPointerException) {
+                JOptionPane.showMessageDialog(null, "INSUFFICIENT STOCK!", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (NumberFormatException numberFormatException) {
+            JOptionPane.showMessageDialog(null, "CHECK INPUT!", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public static void deleteObject(Class classBLL, JTable table) {
@@ -126,7 +165,6 @@ public class Controller {
                 if (method.getName().contains("delete")) {
                     if (table.getSelectedRow() != -1) {
                         method.invoke(object, table.getModel().getValueAt(table.getSelectedRow(), 0));
-                        updateTableEntries((DefaultTableModel) table.getModel(), classBLL);
                     } else {
                         JOptionPane.showMessageDialog(null, "SELECT AN ENTRY!", "ERROR", JOptionPane.INFORMATION_MESSAGE);
                         return;

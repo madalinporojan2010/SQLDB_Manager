@@ -14,6 +14,8 @@ import java.util.logging.Logger;
 
 import application.connection.ConnectionFactory;
 
+import javax.swing.*;
+
 public class AbstractDAO<T> {
     protected static final Logger LOGGER = Logger.getLogger(AbstractDAO.class.getName());
 
@@ -48,6 +50,10 @@ public class AbstractDAO<T> {
         nextIdInTable = freeID;
     }
 
+    public int getNextIdInTable() {
+        return nextIdInTable;
+    }
+
     private String createSelectQuery(String field) {
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT ");
@@ -76,7 +82,6 @@ public class AbstractDAO<T> {
 
     private String createDeleteQuery() {
         StringBuilder sb = new StringBuilder();
-        //DELETE FROM `werehousebd`.`client` WHERE (`idClient` = '2');
         sb.append(" DELETE ");
         sb.append(" FROM ");
         sb.append(" werehousebd." + type.getSimpleName());
@@ -174,11 +179,18 @@ public class AbstractDAO<T> {
                 } else {
                     isFirstField = false;
                     setNextIdInTable();
+                    for(Method method : t.getClass().getDeclaredMethods()) {
+                        if(method.getName().contains("setId" + type.getSimpleName())) {
+                            method.invoke(t, nextIdInTable);
+                            break;
+                        }
+                    }
                     statement.setInt(i++, nextIdInTable);
                 }
             }
+            System.out.println(statement.toString());
             statement.executeUpdate();
-        } catch (SQLException | IllegalAccessException e) {
+        } catch (SQLException | IllegalAccessException | InvocationTargetException e) {
             LOGGER.log(Level.WARNING, type.getName() + "DAO:insert " + e.getMessage());
         } finally {
             ConnectionFactory.close(statement);
@@ -204,6 +216,7 @@ public class AbstractDAO<T> {
                 statement.setInt(1, id);
                 statement.execute();
             } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, "DELETE THE CORRESPONDING ORDER FIRST!", "ERROR", JOptionPane.INFORMATION_MESSAGE);
                 LOGGER.log(Level.WARNING, type.getName() + "DAO:delete " + e.getMessage());
             } finally {
                 ConnectionFactory.close(statement);
