@@ -18,7 +18,7 @@ public class OrderDAO extends AbstractDAO<Order> {
 
     ;
 
-    private String createUpdateStockQuery() {
+    private String createUpdateQuery() {
         StringBuilder sb = new StringBuilder();
         sb.append(" UPDATE ");
         sb.append(" werehousebd.product");
@@ -33,7 +33,7 @@ public class OrderDAO extends AbstractDAO<Order> {
     public void updateStock(int id, Operation operation) {
         Connection connection = null;
         PreparedStatement statement = null;
-        String query = createUpdateStockQuery();
+        String query = createUpdateQuery();
         try {
             connection = ConnectionFactory.getConnection();
             statement = connection.prepareStatement(query);

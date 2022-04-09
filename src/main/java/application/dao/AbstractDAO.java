@@ -80,6 +80,19 @@ public class AbstractDAO<T> {
         return sb.toString();
     }
 
+    private String createUpdateQuery() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(" UPDATE ");
+        sb.append(" werehousebd." + type.getSimpleName());
+        sb.append(" SET ");
+        for (Field field : type.getDeclaredFields()) {
+            sb.append(" " + field.getName() + " =? ,");
+        }
+        sb.setCharAt(sb.length() - 1, ' ');
+        sb.append(" WHERE( id" + type.getSimpleName() + " = ? )");
+        return sb.toString();
+    }
+
     private String createDeleteQuery() {
         StringBuilder sb = new StringBuilder();
         sb.append(" DELETE ");
@@ -179,8 +192,8 @@ public class AbstractDAO<T> {
                 } else {
                     isFirstField = false;
                     setNextIdInTable();
-                    for(Method method : t.getClass().getDeclaredMethods()) {
-                        if(method.getName().contains("setId" + type.getSimpleName())) {
+                    for (Method method : t.getClass().getDeclaredMethods()) {
+                        if (method.getName().contains("setId" + type.getSimpleName())) {
                             method.invoke(t, nextIdInTable);
                             break;
                         }
@@ -188,7 +201,6 @@ public class AbstractDAO<T> {
                     statement.setInt(i++, nextIdInTable);
                 }
             }
-            System.out.println(statement.toString());
             statement.executeUpdate();
         } catch (SQLException | IllegalAccessException | InvocationTargetException e) {
             LOGGER.log(Level.WARNING, type.getName() + "DAO:insert " + e.getMessage());
@@ -201,7 +213,26 @@ public class AbstractDAO<T> {
     }
 
     public T update(T t) {
-        // TODO:
+        Connection connection = null;
+        PreparedStatement statement = null;
+        String updateQuery = createUpdateQuery();
+        try {
+            connection = ConnectionFactory.getConnection();
+            statement = connection.prepareStatement(updateQuery);
+
+            int paramIndex = 1;
+            for (Field field : t.getClass().getDeclaredFields()) {
+                statement.setObject(paramIndex, field.get(t));
+                paramIndex++;
+            }
+
+            statement.executeUpdate();
+        } catch (SQLException | IllegalAccessException e) {
+            LOGGER.log(Level.WARNING, type.getName() + "DAO:insert " + e.getMessage());
+        } finally {
+            ConnectionFactory.close(statement);
+            ConnectionFactory.close(connection);
+        }
         return t;
     }
 

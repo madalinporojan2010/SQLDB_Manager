@@ -44,6 +44,13 @@ public class ProductBLL {
 		}
 	}
 
+	public void updateProduct(Product product) {
+		Product updatedProduct = productDAO.update(product);
+		if (updatedProduct == null) {
+			throw new NullPointerException("Client was not updated");
+		}
+	}
+
 	public void deleteProductById(int id) {
 		if(!productDAO.deleteById(id)) {
 			throw new NullPointerException("Product was not deleted");

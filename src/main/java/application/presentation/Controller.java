@@ -49,7 +49,6 @@ public class Controller {
         mainGUI.getOrderTableScrollPane().setVisible(false);
         mainGUI.getOrderTableLabel().setVisible(false);
         mainGUI.getInsertButton().setVisible(true);
-        mainGUI.getUpdateButton().setVisible(true);
         mainGUI.getOrderButton().setVisible(false);
         mainGUI.getPrintBillButton().setVisible(false);
         mainGUI.getFrame().setSize(671, 537);
@@ -62,7 +61,6 @@ public class Controller {
         } else if (selectedTable.contains("Order")) {
             mainGUI.getFrame().setSize(1000, 537);
             mainGUI.getInsertButton().setVisible(false);
-            mainGUI.getUpdateButton().setVisible(false);
             mainGUI.getOrderButton().setVisible(true);
             mainGUI.getPrintBillButton().setVisible(true);
             mainGUI.getClientTableScrollPane().setVisible(true);
@@ -92,6 +90,16 @@ public class Controller {
                 addActionListenersToInsertToTable(productBLL, productModel, insertIntoProductGUI.getTextFields(), insertIntoProductGUI.getFrame(), insertIntoProductGUI.getExecuteButton());
             }
         };
+        ActionListener updateFromTableButtonListener = e -> {
+            if (selectedTable.contains("Client")) {
+                updateObject(clientBLL, clientModel, null);
+            } else if (selectedTable.contains("Product")) {
+                updateObject(productBLL, productModel, null);
+            } else if (selectedTable.contains("Order")) {
+                updateObject(orderBLL, orderModel, null);
+            }
+            updateAllTables();
+        };
         ActionListener deleteFromTableButtonListener = e -> {
             if (selectedTable.contains("Client")) {
                 deleteObject(clientBLL, mainGUI.getClientTable());
@@ -110,6 +118,7 @@ public class Controller {
         };
         mainGUI.getTableBox().addItemListener(tableBoxListener);
         mainGUI.getInsertButton().addActionListener(insertTableButtonListener);
+        mainGUI.getUpdateButton().addActionListener(updateFromTableButtonListener);
         mainGUI.getDeleteButton().addActionListener(deleteFromTableButtonListener);
         mainGUI.getOrderButton().addActionListener(orderButtonListener);
     }
@@ -126,6 +135,30 @@ public class Controller {
             }
         };
         button.addActionListener(executeButtonListener);
+    }
+
+    public static void updateObject(Class classBLL, Class classModel, List<JTextField> textFields) {
+        //Object object = setObjectProprieties(classModel, textFields);
+        Object classBLLObject = null;
+        try {
+            classBLLObject = classBLL.getDeclaredConstructors()[0].newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        Method[] methods = classBLL.getMethods();
+        Method update = null;
+        for (Method method : methods) {
+            if (method.getName().contains("update")) {
+                update = method;
+                break;
+            }
+        }
+
+        try {
+            update.invoke(classBLLObject, (Object)null);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void makeOrder(List<JTable> tables) {

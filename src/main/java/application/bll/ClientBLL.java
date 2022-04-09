@@ -49,6 +49,13 @@ public class ClientBLL {
 		}
 	}
 
+	public void updateClient(Client client) {
+		Client updatedClient = clientDAO.update(client);
+		if (updatedClient == null) {
+			throw new NullPointerException("Client was not updated");
+		}
+	}
+
 	public void deleteClientById(int id) {
 		if(!clientDAO.deleteById(id)) {
 			throw new NullPointerException("Client was not deleted");

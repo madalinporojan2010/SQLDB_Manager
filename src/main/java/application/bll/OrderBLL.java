@@ -46,6 +46,13 @@ public class OrderBLL {
 		}
 	}
 
+	public void updateOrder(Order order) {
+		Order updatedOrder = orderDAO.update(order);
+		if (updatedOrder == null) {
+			throw new NullPointerException("Client was not updated");
+		}
+	}
+
 	public void deleteOrderById(int id) {
 		if(!orderDAO.deleteById(id)) {
 			throw new NullPointerException("Order was not deleted");
