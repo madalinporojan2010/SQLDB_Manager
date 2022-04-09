@@ -4,21 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import application.bll.validators.EmailValidator;
 import application.dao.OrderDAO;
 import application.model.Order;
 import application.model.Product;
-import bll.validators.Validator;
 
 
 public class OrderBLL {
-    private List<EmailValidator> validators;
 	private OrderDAO orderDAO;
 
 	public OrderBLL() {
-		validators = new ArrayList<EmailValidator>();
-		validators.add(new EmailValidator());
-
 		orderDAO = new OrderDAO();
 	}
 

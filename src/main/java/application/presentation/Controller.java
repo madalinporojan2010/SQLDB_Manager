@@ -181,8 +181,8 @@ public class Controller {
     public static void updateObject(Class classBLL, Class classModel, List<JTextField> textFields) throws Exception {
         List<JTextField> textFieldsWithoutId = new ArrayList<>();
         textFieldsWithoutId.addAll(textFields.subList(1, textFields.size()));
-        Object object = setObjectProprieties(classModel, textFieldsWithoutId);
         Object classBLLObject = null;
+        Object object = setObjectProprieties(classModel, textFieldsWithoutId);
         try {
             classBLLObject = classBLL.getDeclaredConstructors()[0].newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

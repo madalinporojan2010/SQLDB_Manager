@@ -13,10 +13,9 @@ import java.util.logging.Level;
 
 public class OrderDAO extends AbstractDAO<Order> {
     private enum Operation {
-        DELETE, INSERT
+        DELETE, INSERT, UPDATE
     }
 
-    ;
 
     private String createUpdateQuery() {
         StringBuilder sb = new StringBuilder();
@@ -30,7 +29,7 @@ public class OrderDAO extends AbstractDAO<Order> {
     }
     //UPDATE `werehousebd`.`product` SET `stock` = '35' WHERE (`idProduct` = '0') and (`name` = 'ad');
 
-    public void updateStock(int id, Operation operation) {
+    public void updateStock(int id, Operation operation, Order updatedOrder) {
         Connection connection = null;
         PreparedStatement statement = null;
         String query = createUpdateQuery();
@@ -42,6 +41,8 @@ public class OrderDAO extends AbstractDAO<Order> {
                 statement.setInt(1, new ProductDAO().findById(this.findById(id).getIdProduct()).getStock() + this.findById(id).getAmmount());
             } else if (operation == Operation.INSERT) {
                 statement.setInt(1, new ProductDAO().findById(this.findById(id).getIdProduct()).getStock() - this.findById(id).getAmmount());
+            } else if (operation == Operation.UPDATE) {
+                statement.setInt(1, new ProductDAO().findById(this.findById(id).getIdProduct()).getStock() + (this.findById(id).getAmmount() - updatedOrder.getAmmount()));
             }
             statement.setInt(2, this.findById(id).getIdProduct());
             statement.executeUpdate();
@@ -54,16 +55,25 @@ public class OrderDAO extends AbstractDAO<Order> {
     }
 
     public boolean deleteById(int id) {
-        updateStock(id, Operation.DELETE);
+        updateStock(id, Operation.DELETE, null);
         return super.deleteById(id);
     }
 
     public Order insert(Order t) {
         if (t.getAmmount() <= new ProductBLL().findProductById(t.getIdProduct()).getStock()) {
             Order order = super.insert(t);
-            updateStock(t.getIdOrder(), Operation.INSERT);
+            updateStock(t.getIdOrder(), Operation.INSERT, null);
             return order;
         }
         return null;
+    }
+
+    public Order update(Order t) {
+        int amountDiff = this.findById(t.getIdOrder()).getAmmount() - t.getAmmount();
+        if(amountDiff < 0 && Math.abs(amountDiff) > new ProductDAO().findById(t.getIdProduct()).getStock()){
+            return null;
+        }
+        updateStock(t.getIdOrder(), Operation.UPDATE, t);
+        return super.update(t);
     }
 }

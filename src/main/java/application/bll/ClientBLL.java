@@ -6,23 +6,17 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.util.NoSuchElementException;
 
-import application.bll.validators.EmailValidator;
 import application.dao.ClientDAO;
 import application.dao.OrderDAO;
 import application.model.Client;
 import application.model.Order;
-import bll.validators.Validator;
 
 
 public class ClientBLL {
 
-	private List<Validator<Client>> validators;
 	private ClientDAO clientDAO;
 
 	public ClientBLL() {
-		validators = new ArrayList<Validator<Client>>();
-		validators.add(new EmailValidator());
-
 		clientDAO = new ClientDAO();
 	}
 

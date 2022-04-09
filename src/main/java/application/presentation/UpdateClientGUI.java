@@ -22,6 +22,11 @@ public class UpdateClientGUI {
     private JPanel panel1;
 
     public UpdateClientGUI() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
         frame = new JFrame("Update");
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.setContentPane(panel1);
@@ -31,7 +36,7 @@ public class UpdateClientGUI {
         frame.setVisible(true);
     }
 
-    public List<JTextField> getTextFields () {
+    public List<JTextField> getTextFields() {
         ArrayList<JTextField> textFields = new ArrayList<>();
         textFields.add(clientIDTextField);
         textFields.add(nameTextField);

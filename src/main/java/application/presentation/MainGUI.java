@@ -30,6 +30,11 @@ public class MainGUI {
 
 
     public MainGUI() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
         frame = new JFrame("Main menu");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setContentPane(panel1);
@@ -60,7 +65,6 @@ public class MainGUI {
             }
         };
         orderTable.setModel(orderTableModel);
-
     }
 
     public List<JTable> getTables() {

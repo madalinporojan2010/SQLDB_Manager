@@ -4,20 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import application.bll.validators.EmailValidator;
 import application.dao.ProductDAO;
 import application.model.Product;
-import bll.validators.Validator;
 
 
 public class ProductBLL {
-    private List<EmailValidator> validators;
 	private ProductDAO productDAO;
 
 	public ProductBLL() {
-		validators = new ArrayList<EmailValidator>();
-		validators.add(new EmailValidator());
-
 		productDAO = new ProductDAO();
 	}
 
