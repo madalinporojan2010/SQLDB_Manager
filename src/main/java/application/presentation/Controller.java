@@ -230,8 +230,8 @@ public class Controller {
             order.setIdProduct((int) tables.get(1).getModel().getValueAt(tables.get(1).getSelectedRow(), 0));
             try {
                 orderBLLObj.insertOrder(order);
-            } catch (NullPointerException nullPointerException) {
-                JOptionPane.showMessageDialog(null, "INSUFFICIENT STOCK!", "ERROR", JOptionPane.ERROR_MESSAGE);
+            } catch (NullPointerException | IllegalArgumentException exception) {
+                JOptionPane.showMessageDialog(null, "RECHECK AMOUNT/STOCK!", "ERROR", JOptionPane.ERROR_MESSAGE);
             }
 
         } catch (NumberFormatException numberFormatException) {
@@ -259,7 +259,7 @@ public class Controller {
         }
     }
 
-    public static Object setObjectProprieties(Class classModel, List<JTextField> textFields) throws Exception {
+    public static Object setObjectProprieties(Class classModel, List<JTextField> textFields) {
         Object object = null;
         try {
             object = classModel.getDeclaredConstructors()[0].newInstance();
@@ -270,7 +270,12 @@ public class Controller {
                     String fieldName = field.getName();
                     Object value = null;
                     if (field.getType().getSimpleName().contains("int")) {
-                        value = Integer.parseInt(textFields.get(textFieldsIterator).getText());
+                        try {
+                            value = Integer.parseInt(textFields.get(textFieldsIterator).getText());
+                        } catch (NumberFormatException numberFormatException) {
+                            JOptionPane.showMessageDialog(null, "CHECK INPUT!", "ERROR", JOptionPane.INFORMATION_MESSAGE);
+                            return null;
+                        }
                     } else {
                         value = textFields.get(textFieldsIterator).getText();
                     }// afisarea unui singur table/selectie
@@ -284,7 +289,8 @@ public class Controller {
                         }
                         textFieldsIterator++;
                     } else {
-                        throw new Exception("Format error");
+                        JOptionPane.showMessageDialog(null, "CHECK INPUT!", "ERROR", JOptionPane.INFORMATION_MESSAGE);
+                        return null;
                     }
                 }
                 isFirstField = false;
@@ -315,8 +321,8 @@ public class Controller {
 
         try {
             insert.invoke(classBLLObject, object);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(null, "CHECK YOUR INFORMATION!", "ERROR", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 

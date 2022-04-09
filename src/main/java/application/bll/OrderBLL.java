@@ -4,15 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import application.bll.validators.AmountValidator;
+import application.bll.validators.Validator;
 import application.dao.OrderDAO;
 import application.model.Order;
-import application.model.Product;
 
 
 public class OrderBLL {
+    private List<Validator<Order>> validators;
 	private OrderDAO orderDAO;
 
 	public OrderBLL() {
+        validators = new ArrayList<Validator<Order>>();
+        validators.add(new AmountValidator());
+
 		orderDAO = new OrderDAO();
 	}
 
@@ -34,6 +39,9 @@ public class OrderBLL {
 
 
 	public void insertOrder(Order order) {
+        for (Validator<Order> validator : validators) {
+            validator.validate(order);
+        }
 		Order insertedOrder = orderDAO.insert(order);
 		if (insertedOrder == null) {
 			throw new NullPointerException("Order was not inserted");
@@ -41,6 +49,10 @@ public class OrderBLL {
 	}
 
 	public void updateOrder(Order order) {
+        for (Validator<Order> validator : validators) {
+            validator.validate(order);
+        }
+
 		Order updatedOrder = orderDAO.update(order);
 		if (updatedOrder == null) {
 			throw new NullPointerException("Client was not updated");

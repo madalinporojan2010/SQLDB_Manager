@@ -4,14 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import application.bll.validators.PriceValidator;
+import application.bll.validators.ProductNameValidator;
+import application.bll.validators.StockValidator;
+import application.bll.validators.Validator;
 import application.dao.ProductDAO;
 import application.model.Product;
 
 
 public class ProductBLL {
+    private List<Validator<Product>> validators;
 	private ProductDAO productDAO;
 
 	public ProductBLL() {
+        validators = new ArrayList<Validator<Product>>();
+        validators.add(new ProductNameValidator());
+        validators.add(new StockValidator());
+        validators.add(new PriceValidator());
+
 		productDAO = new ProductDAO();
 	}
 
@@ -32,6 +42,10 @@ public class ProductBLL {
 	}
 
 	public void insertProduct(Product product) {
+        for (Validator<Product> validator : validators) {
+            validator.validate(product);
+        }
+
 		Product insertedProduct = productDAO.insert(product);
 		if (insertedProduct == null) {
 			throw new NullPointerException("Product was not inserted");
@@ -39,6 +53,10 @@ public class ProductBLL {
 	}
 
 	public void updateProduct(Product product) {
+        for (Validator<Product> validator : validators) {
+            validator.validate(product);
+        }
+
 		Product updatedProduct = productDAO.update(product);
 		if (updatedProduct == null) {
 			throw new NullPointerException("Client was not updated");
