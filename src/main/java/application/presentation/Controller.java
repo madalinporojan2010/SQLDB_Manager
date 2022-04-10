@@ -1,21 +1,17 @@
 package application.presentation;
 
-import application.bll.OrderBLL;
-import application.model.Order;
-
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
 import java.io.FileNotFoundException;
-import java.lang.reflect.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+
+/**
+ * The controller of the Order Management application that links the models with the view.
+ */
 public class Controller {
     private MainGUI mainGUI;
     private InsertIntoClientGUI insertIntoClientGUI;
@@ -33,6 +29,13 @@ public class Controller {
     private final Class orderBLL = Class.forName("application.bll.OrderBLL");
     private String selectedTable = "Client";
 
+
+    /**
+     * The Controller constructor that instantiates the MainGUI and changes the way it looks. Also, it updates the content of the corresponding tables
+     * and adds action listeners to the main gui buttons and input UI.
+     *
+     * @throws ClassNotFoundException Stating that the classes corresponding to the models were not found.
+     */
     public Controller() throws ClassNotFoundException {
         mainGUI = new MainGUI();
         changeGUI();
@@ -41,12 +44,19 @@ public class Controller {
         addActionListenersToMainGUI();
     }
 
+    /**
+     * Updates the Client, Product and Order JTables.
+     */
     public void updateAllTables() {
-        updateTableEntries(mainGUI.getClientTableModel(), clientBLL);
-        updateTableEntries(mainGUI.getProductTableModel(), productBLL);
-        updateTableEntries(mainGUI.getOrderTableModel(), orderBLL);
+        GUIOperations.updateTableEntries(mainGUI.getClientTableModel(), clientBLL);
+        GUIOperations.updateTableEntries(mainGUI.getProductTableModel(), productBLL);
+        GUIOperations.updateTableEntries(mainGUI.getOrderTableModel(), orderBLL);
     }
 
+    /**
+     * Changes the way the UI looks based on the drop box menu.<p>
+     * Client, Product or Order Management.
+     */
     public void changeGUI() {
         mainGUI.getClientTableScrollPane().setVisible(false);
         mainGUI.getClientTableLabel().setVisible(false);
@@ -78,45 +88,10 @@ public class Controller {
         }
     }
 
-    public void updateFields(JTable table, List<JTextField> textFields) {
-        if (table.getSelectedRow() != -1) {
-            for (int column = 0; column < table.getColumnCount(); column++) {
-                textFields.get(column).setText(table.getValueAt(table.getSelectedRow(), column).toString());
-            }
-        }
-    }
-
-    public void addActionListenersToUpdateTable(Class classBLL, Class classModel, List<JTextField> textFields, JFrame frame, JButton button) {
-        ActionListener executeButtonListener = e -> {
-            try {
-                updateObject(classBLL, classModel, textFields);
-                updateAllTables();
-                frame.dispose();
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "CHECK INPUT!", "ERROR", JOptionPane.ERROR_MESSAGE);
-            }
-        };
-        button.addActionListener(executeButtonListener);
-    }
-
-    public void addActionListenersToMainGUI() {
-        ItemListener tableBoxListener = e -> {
-            if (e.getStateChange() == ItemEvent.SELECTED) {
-                if (e.getSource() instanceof JComboBox) {
-                    selectedTable = ((JComboBox<?>) e.getSource()).getSelectedItem().toString();
-                    changeGUI();
-                }
-            }
-        };
-        ActionListener insertTableButtonListener = e -> {
-            if (selectedTable.contains("Client")) {
-                insertIntoClientGUI = new InsertIntoClientGUI();
-                addActionListenersToInsertToTable(clientBLL, clientModel, insertIntoClientGUI.getTextFields(), insertIntoClientGUI.getFrame(), insertIntoClientGUI.getExecuteButton());
-            } else if (selectedTable.contains("Product")) {
-                insertIntoProductGUI = new InsertIntoProductGUI();
-                addActionListenersToInsertToTable(productBLL, productModel, insertIntoProductGUI.getTextFields(), insertIntoProductGUI.getFrame(), insertIntoProductGUI.getExecuteButton());
-            }
-        };
+    /**
+     * Adds the update action listener to the update button.
+     */
+    public void addUpdateActionListenerToUpdateButtonFromMainGUI() {
         ActionListener updateFromTableButtonListener = e -> {
             if (selectedTable.contains("Client")) {
                 if (mainGUI.getClientTable().getSelectedRow() != -1) {
@@ -142,19 +117,58 @@ public class Controller {
             }
             updateAllTables();
         };
+        mainGUI.getUpdateButton().addActionListener(updateFromTableButtonListener);
+    }
+
+    /**
+     * Adds the insert action listener to the insert button.
+     */
+    public void addInsertTableActionListenerToInsertButtonFromMainGUI() {
+        ActionListener insertTableButtonListener = e -> {
+            if (selectedTable.contains("Client")) {
+                insertIntoClientGUI = new InsertIntoClientGUI();
+                addActionListenersToInsertToTable(clientBLL, clientModel, insertIntoClientGUI.getTextFields(), insertIntoClientGUI.getFrame(), insertIntoClientGUI.getExecuteButton());
+            } else if (selectedTable.contains("Product")) {
+                insertIntoProductGUI = new InsertIntoProductGUI();
+                addActionListenersToInsertToTable(productBLL, productModel, insertIntoProductGUI.getTextFields(), insertIntoProductGUI.getFrame(), insertIntoProductGUI.getExecuteButton());
+            }
+        };
+        mainGUI.getInsertButton().addActionListener(insertTableButtonListener);
+    }
+
+    /**
+     * Adds the delete action listener to the delete button.
+     */
+    public void addDeleteFromTableActionListenerToDeleteButtonFromMainGUI() {
         ActionListener deleteFromTableButtonListener = e -> {
             if (selectedTable.contains("Client")) {
-                deleteObject(clientBLL, mainGUI.getClientTable());
+                GUIOperations.deleteObject(clientBLL, mainGUI.getClientTable());
             } else if (selectedTable.contains("Product")) {
-                deleteObject(productBLL, mainGUI.getProductTable());
+                GUIOperations.deleteObject(productBLL, mainGUI.getProductTable());
             } else if (selectedTable.contains("Order")) {
-                deleteObject(orderBLL, mainGUI.getOrderTable());
+                GUIOperations.deleteObject(orderBLL, mainGUI.getOrderTable());
             }
             updateAllTables();
         };
+        mainGUI.getDeleteButton().addActionListener(deleteFromTableButtonListener);
+    }
+
+    /**
+     * Adds the action listeners to the main gui buttons and input UI.
+     */
+    public void addActionListenersToMainGUI() {
+        ItemListener tableBoxListener = e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                if (e.getSource() instanceof JComboBox) {
+                    selectedTable = ((JComboBox<?>) e.getSource()).getSelectedItem().toString();
+                    changeGUI();
+                }
+            }
+        };
+
         ActionListener orderButtonListener = e -> {
             if (selectedTable.contains("Order")) {
-                makeOrder(mainGUI.getTables());
+                GUIOperations.makeOrder(mainGUI.getTables());
             }
             updateAllTables();
         };
@@ -169,18 +183,27 @@ public class Controller {
 
             }
         };
+        addInsertTableActionListenerToInsertButtonFromMainGUI();
+        addUpdateActionListenerToUpdateButtonFromMainGUI();
+        addDeleteFromTableActionListenerToDeleteButtonFromMainGUI();
         mainGUI.getTableBox().addItemListener(tableBoxListener);
-        mainGUI.getInsertButton().addActionListener(insertTableButtonListener);
-        mainGUI.getUpdateButton().addActionListener(updateFromTableButtonListener);
-        mainGUI.getDeleteButton().addActionListener(deleteFromTableButtonListener);
         mainGUI.getOrderButton().addActionListener(orderButtonListener);
         mainGUI.getPrintBillButton().addActionListener(printBillButtonListener);
     }
 
+    /**
+     * Adds the execute action listeners for inserting, to the class specific execute button.
+     *
+     * @param classBLL   Generic class that corresponds to the Business Layer.
+     * @param classModel Generic class that corresponds to the model.
+     * @param textFields The Text fields corresponding to the respective generic class.
+     * @param frame      The frame corresponding to the respective generic class.
+     * @param button     The button corresponding to the insert operation.
+     */
     public void addActionListenersToInsertToTable(Class classBLL, Class classModel, List<JTextField> textFields, JFrame frame, JButton button) {
         ActionListener executeButtonListener = e -> {
             try {
-                insertObject(classBLL, classModel, textFields);
+                GUIOperations.insertObject(classBLL, classModel, textFields);
                 updateAllTables();
                 frame.dispose();
             } catch (Exception exception) {
@@ -191,209 +214,44 @@ public class Controller {
         button.addActionListener(executeButtonListener);
     }
 
-
-    public static void updateObject(Class classBLL, Class classModel, List<JTextField> textFields) throws Exception {
-        List<JTextField> textFieldsWithoutId = new ArrayList<>();
-        textFieldsWithoutId.addAll(textFields.subList(1, textFields.size()));
-        Object classBLLObject = null;
-        Object object = setObjectProprieties(classModel, textFieldsWithoutId);
-        try {
-            classBLLObject = classBLL.getDeclaredConstructors()[0].newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        Method[] methods = classBLL.getMethods();
-        Method update = null;
-        for (Method method : methods) {
-            if (method.getName().contains("update")) {
-                update = method;
-                break;
-            }
-        }
-
-        for (Method method : object.getClass().getDeclaredMethods()) {
-            if (method.getName().contains("setId" + object.getClass().getSimpleName())) {
-                method.invoke(object, Integer.parseInt(textFields.get(0).getText()));
-                break;
-            }
-        }
-
-        try {
-            update.invoke(classBLLObject, object);
-        } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
-            throw new Exception("Invalid data!");
-        }
-    }
-
-    public static void makeOrder(List<JTable> tables) {
-        if (tables.get(0).getSelectedRow() == -1 || tables.get(1).getSelectedRow() == -1) {
-            JOptionPane.showMessageDialog(null, "SELECT THE `CLIENT` AND THE `PRODUCT`!", "ERROR", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        Order order = new Order();
-        OrderBLL orderBLLObj = new OrderBLL();
-        int amount = 0;
-        try {
-            String amountString = JOptionPane.showInputDialog("Amount:");
-            if (amountString == null) {
-                return;
-            }
-            amount = Integer.parseInt(amountString);
-            order.setAmount(amount);
-            order.setIdClient((int) tables.get(0).getModel().getValueAt(tables.get(0).getSelectedRow(), 0));
-            order.setIdProduct((int) tables.get(1).getModel().getValueAt(tables.get(1).getSelectedRow(), 0));
+    /**
+     * Adds the execute action listeners for updating, to the class specific execute button.
+     *
+     * @param classBLL   Generic class that corresponds to the Business Layer.
+     * @param classModel Generic class that corresponds to the model.
+     * @param textFields The Text fields corresponding to the respective generic class.
+     * @param frame      The frame corresponding to the respective generic class.
+     * @param button     The button corresponding to the update operation.
+     */
+    public void addActionListenersToUpdateTable(Class classBLL, Class classModel, List<JTextField> textFields, JFrame frame, JButton button) {
+        ActionListener executeButtonListener = e -> {
             try {
-                orderBLLObj.insertOrder(order);
-            } catch (NullPointerException | IllegalArgumentException exception) {
-                JOptionPane.showMessageDialog(null, "RECHECK AMOUNT/STOCK!", "ERROR", JOptionPane.ERROR_MESSAGE);
+                GUIOperations.updateObject(classBLL, classModel, textFields);
+                updateAllTables();
+                frame.dispose();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "CHECK INPUT!", "ERROR", JOptionPane.ERROR_MESSAGE);
             }
-
-        } catch (NumberFormatException numberFormatException) {
-            JOptionPane.showMessageDialog(null, "CHECK INPUT!", "ERROR", JOptionPane.ERROR_MESSAGE);
-        }
+        };
+        button.addActionListener(executeButtonListener);
     }
-
-    public static void deleteObject(Class classBLL, JTable table) {
-        Object object = null;
-        try {
-            object = classBLL.getDeclaredConstructors()[0].newInstance();
-            for (Method method : object.getClass().getDeclaredMethods()) {
-                if (method.getName().contains("delete")) {
-                    if (table.getSelectedRow() != -1) {
-                        method.invoke(object, table.getModel().getValueAt(table.getSelectedRow(), 0));
-                    } else {
-                        JOptionPane.showMessageDialog(null, "SELECT AN ENTRY!", "ERROR", JOptionPane.INFORMATION_MESSAGE);
-                        return;
-                    }
-                    break;
-                }
-            }
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static Object setObjectProprieties(Class classModel, List<JTextField> textFields) {
-        Object object = null;
-        try {
-            object = classModel.getDeclaredConstructors()[0].newInstance();
-            int textFieldsIterator = 0;
-            boolean isFirstField = true;
-            for (Field field : object.getClass().getDeclaredFields()) {
-                if (!isFirstField) {
-                    String fieldName = field.getName();
-                    Object value = null;
-                    if (field.getType().getSimpleName().contains("int")) {
-                        try {
-                            value = Integer.parseInt(textFields.get(textFieldsIterator).getText());
-                        } catch (NumberFormatException numberFormatException) {
-                            JOptionPane.showMessageDialog(null, "CHECK INPUT!", "ERROR", JOptionPane.INFORMATION_MESSAGE);
-                            return null;
-                        }
-                    } else {
-                        value = textFields.get(textFieldsIterator).getText();
-                    }// afisarea unui singur table/selectie
-                    if (value != null && !value.equals("")) {
-                        PropertyDescriptor propertyDescriptor = new PropertyDescriptor(fieldName, classModel);
-                        Method method = propertyDescriptor.getWriteMethod();
-                        try {
-                            method.invoke(object, value);
-                        } catch (IllegalAccessException | InvocationTargetException e) {
-                            e.printStackTrace();
-                        }
-                        textFieldsIterator++;
-                    } else {
-                        JOptionPane.showMessageDialog(null, "CHECK INPUT!", "ERROR", JOptionPane.INFORMATION_MESSAGE);
-                        return null;
-                    }
-                }
-                isFirstField = false;
-            }
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | IntrospectionException e) {
-            e.printStackTrace();
-        }
-
-        return object;
-    }
-
-    public static void insertObject(Class classBLL, Class classModel, List<JTextField> textFields) throws Exception {
-        Object object = setObjectProprieties(classModel, textFields);
-        Object classBLLObject = null;
-        try {
-            classBLLObject = classBLL.getDeclaredConstructors()[0].newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        Method[] methods = classBLL.getMethods();
-        Method insert = null;
-        for (Method method : methods) {
-            if (method.getName().contains("insert")) {
-                insert = method;
-                break;
-            }
-        }
-
-        try {
-            insert.invoke(classBLLObject, object);
-        } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
-            JOptionPane.showMessageDialog(null, "CHECK YOUR INFORMATION!", "ERROR", JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
-
-    public static void setTableProprieties(DefaultTableModel tableModel, Object object) {
-        Object[] columnBuilder = new Object[object.getClass().getDeclaredFields().length];
-        Object[] rowBuilder = new Object[object.getClass().getDeclaredFields().length];
-        int fieldIterator = 0;
-        for (Field field : object.getClass().getDeclaredFields()) {
-            field.setAccessible(true);
-            Object value;
-            try {
-                value = field.get(object);
-                rowBuilder[fieldIterator] = value;
-                columnBuilder[fieldIterator++] = field.getName();
-            } catch (IllegalArgumentException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        tableModel.setColumnIdentifiers(columnBuilder);
-        tableModel.addRow(rowBuilder);
-    }
-
-    public static void updateTableEntries(DefaultTableModel tableModel, Class classBLL) {
-        Object classBLLObject = null;
-        try {
-            classBLLObject = classBLL.getDeclaredConstructors()[0].newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        Method[] methods = classBLL.getMethods();
-        Method findAll = null;
-        for (Method method : methods) {
-            if (method.getName().contains("findAll")) {
-                findAll = method;
-                break;
-            }
-        }
-        List<Object> objects = null;
-        try {
-            objects = new ArrayList<Object>((List<Object>) findAll.invoke(classBLLObject));
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-
-        tableModel.getDataVector().removeAllElements();
-        if (objects.size() == 0)
-            tableModel.setColumnIdentifiers((Object[]) null);
-        else {
-            for (Object object : objects) {
-                setTableProprieties(tableModel, object);
-            }
-        }
-    }
-
 
     /**
-     * @param args
+     * Updates the fields from the updateGUI required for the update operation.
+     *
+     * @param table      The table that contains the data to be updated.
+     * @param textFields The Text fields corresponding to the respective table.
+     */
+    public void updateFields(JTable table, List<JTextField> textFields) {
+        if (table.getSelectedRow() != -1) {
+            for (int column = 0; column < table.getColumnCount(); column++) {
+                textFields.get(column).setText(table.getValueAt(table.getSelectedRow(), column).toString());
+            }
+        }
+    }
+
+    /**
+     * Runs the application.
      */
     public static void main(String[] args) {
         try {
