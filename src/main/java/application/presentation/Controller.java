@@ -392,6 +392,9 @@ public class Controller {
     }
 
 
+    /**
+     * @param args
+     */
     public static void main(String[] args) {
         try {
             Controller controller = new Controller();
