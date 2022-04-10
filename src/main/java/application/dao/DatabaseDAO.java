@@ -13,11 +13,21 @@ import java.util.logging.Level;
 /**
  * A Database Data Access Object that extends the AbstractDAO generic class.
  */
-public class DatabaseDAO extends AbstractDAO<BillData>{
+public class DatabaseDAO extends AbstractDAO<BillData> {
+    /**
+     * Creates a 3 table join (Client-Order-Product) query for the DatabaseDAO model.
+     *
+     * @return The join query.
+     */
     private String createJoinQuery() {
         return "SELECT o.idOrder, c.idClient, c.name 'clientName', c.age, c.phone, c.address, c.email, p.idProduct, p.name 'productName', p.price, p.stock, o.ammount FROM werehousebd.client c JOIN werehousebd.order o ON (c.idClient = o.idClient) JOIN werehousebd.product p ON(o.idProduct = p.idProduct) ORDER BY o.idOrder";
     }
 
+    /**
+     * Finds all the entries in the data resulted from the join statement.
+     *
+     * @return A List of generic BillData objects.
+     */
     public List<BillData> findAll() {
         Connection connection = null;
         PreparedStatement statement = null;

@@ -1,37 +1,52 @@
 package application.dao;
 
-import application.bll.OrderBLL;
 import application.bll.ProductBLL;
 import application.connection.ConnectionFactory;
 import application.model.Order;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
 /**
- * A Order Data Access Object that extends the AbstractDAO generic class.
+ * An Order Data Access Object that extends the AbstractDAO generic class.
  */
 public class OrderDAO extends AbstractDAO<Order> {
+    /**
+     * Operations on the Order table. <p>
+     * DELETE - delete operation (increasing product stock) <p>
+     * INSERT - insert operation (decreasing product stock) <p>
+     * UPDATE - update operation (increasing/decreasing product stock)
+     */
     private enum Operation {
         DELETE, INSERT, UPDATE
     }
 
 
+    /**
+     * Creates an update query for the product model, changing the product stock.
+     *
+     * @return The update query.
+     */
     private String createUpdateQuery() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(" UPDATE ");
-        sb.append(" werehousebd.product");
-        sb.append(" SET ");
-        sb.append(" stock =? ");
-        sb.append(" WHERE ");
-        sb.append(" (`idProduct` =? )");
-        return sb.toString();
+        StringBuilder updateQueryString = new StringBuilder();
+        updateQueryString.append(" UPDATE ");
+        updateQueryString.append(" werehousebd.product");
+        updateQueryString.append(" SET ");
+        updateQueryString.append(" stock =? ");
+        updateQueryString.append(" WHERE ");
+        updateQueryString.append(" (`idProduct` =? )");
+        return updateQueryString.toString();
     }
-    //UPDATE `werehousebd`.`product` SET `stock` = '35' WHERE (`idProduct` = '0') and (`name` = 'ad');
 
+    /**
+     * Updates the product stock at the Order.idProduct in the Product table.
+     *
+     * @param id           The order id.
+     * @param operation    The operation.
+     * @param updatedOrder The updated order (when operation = UPDATE).
+     */
     public void updateStock(int id, Operation operation, Order updatedOrder) {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -57,26 +72,44 @@ public class OrderDAO extends AbstractDAO<Order> {
         }
     }
 
+    /**
+     * Updates the Product stock and then deletes the order.
+     *
+     * @param id The id where the deletion will take place.
+     * @return The superClass deleteById value.
+     */
     public boolean deleteById(int id) {
         updateStock(id, Operation.DELETE, null);
         return super.deleteById(id);
     }
 
-    public Order insert(Order t) {
-        if (t.getAmmount() <= new ProductBLL().findProductById(t.getIdProduct()).getStock()) {
-            Order order = super.insert(t);
-            updateStock(t.getIdOrder(), Operation.INSERT, null);
-            return order;
+    /**
+     * Inserts an Order in the Order table. And decreases the respective Product stock.
+     *
+     * @param order The Order to be inserted.
+     * @return The inserted order.
+     */
+    public Order insert(Order order) {
+        if (order.getAmmount() <= new ProductBLL().findProductById(order.getIdProduct()).getStock()) {
+            Order insertedOrder = super.insert(order);
+            updateStock(order.getIdOrder(), Operation.INSERT, null);
+            return insertedOrder;
         }
         return null;
     }
 
-    public Order update(Order t) {
-        int amountDiff = this.findById(t.getIdOrder()).getAmmount() - t.getAmmount();
-        if(amountDiff < 0 && Math.abs(amountDiff) > new ProductDAO().findById(t.getIdProduct()).getStock()){
+    /**
+     * Updates an Order in the Order table and increases/decreases the respective Product stock.
+     *
+     * @param order The order to be updated.
+     * @return The updated order.
+     */
+    public Order update(Order order) {
+        int amountDiff = this.findById(order.getIdOrder()).getAmmount() - order.getAmmount();
+        if (amountDiff < 0 && Math.abs(amountDiff) > new ProductDAO().findById(order.getIdProduct()).getStock()) {
             return null;
         }
-        updateStock(t.getIdOrder(), Operation.UPDATE, t);
-        return super.update(t);
+        updateStock(order.getIdOrder(), Operation.UPDATE, order);
+        return super.update(order);
     }
 }
