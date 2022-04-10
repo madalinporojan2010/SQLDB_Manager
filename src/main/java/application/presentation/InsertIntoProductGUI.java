@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * GUI class for inserting into Product table.
+ */
 public class InsertIntoProductGUI {
     private JPanel panel1;
     private JButton executeButton;
@@ -13,7 +16,9 @@ public class InsertIntoProductGUI {
 
     private JFrame frame;
 
-
+    /**
+     * Constructs the window for inserting in the product table.
+     */
     public InsertIntoProductGUI() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -29,6 +34,11 @@ public class InsertIntoProductGUI {
         frame.setVisible(true);
     }
 
+    /**
+     * TextFields getter that places all the TextFields in a list.
+     *
+     * @return List of JTextField
+     */
     public List<JTextField> getTextFields() {
         List<JTextField> textFields = new ArrayList<>();
         textFields.add(nameTextField);

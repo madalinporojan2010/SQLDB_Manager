@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * GUI class for updating a Client from the Client table.
+ */
 public class UpdateClientGUI {
     private JButton executeButton;
     private JTextField phoneTextField;
@@ -21,6 +24,9 @@ public class UpdateClientGUI {
     private JFrame frame;
     private JPanel panel1;
 
+    /**
+     * Constructs the window for updating a product in the Product table.
+     */
     public UpdateClientGUI() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -36,6 +42,11 @@ public class UpdateClientGUI {
         frame.setVisible(true);
     }
 
+    /**
+     * TextFields getter that places all the TextFields in a list.
+     *
+     * @return List of JTextField
+     */
     public List<JTextField> getTextFields() {
         ArrayList<JTextField> textFields = new ArrayList<>();
         textFields.add(clientIDTextField);

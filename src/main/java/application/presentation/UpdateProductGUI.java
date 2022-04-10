@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * GUI class for updating a Product from the Product table.
+ */
 public class UpdateProductGUI {
     private JTextField nameTextField;
     private JTextField priceTextField;
@@ -14,6 +17,9 @@ public class UpdateProductGUI {
     private JFrame frame;
     private JPanel panel1;
 
+    /**
+     * Constructs the window for updating a product in the Product table.
+     */
     public UpdateProductGUI() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -29,7 +35,12 @@ public class UpdateProductGUI {
         frame.setVisible(true);
     }
 
-    public List<JTextField> getTextFields () {
+    /**
+     * TextFields getter that places all the TextFields in a list.
+     *
+     * @return List of JTextField
+     */
+    public List<JTextField> getTextFields() {
         ArrayList<JTextField> textFields = new ArrayList<>();
         textFields.add(productIdTextField);
         textFields.add(nameTextField);

@@ -220,8 +220,8 @@ public class Controller {
 
         try {
             update.invoke(classBLLObject, object);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
+            throw new Exception("Invalid data!");
         }
     }
 
@@ -232,14 +232,14 @@ public class Controller {
         }
         Order order = new Order();
         OrderBLL orderBLLObj = new OrderBLL();
-        int ammount = 0;
+        int amount = 0;
         try {
-            String ammountString = JOptionPane.showInputDialog("Ammount:");
-            if (ammountString == null) {
+            String amountString = JOptionPane.showInputDialog("Amount:");
+            if (amountString == null) {
                 return;
             }
-            ammount = Integer.parseInt(ammountString);
-            order.setAmmount(ammount);
+            amount = Integer.parseInt(amountString);
+            order.setAmount(amount);
             order.setIdClient((int) tables.get(0).getModel().getValueAt(tables.get(0).getSelectedRow(), 0));
             order.setIdProduct((int) tables.get(1).getModel().getValueAt(tables.get(1).getSelectedRow(), 0));
             try {

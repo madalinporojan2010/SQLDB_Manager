@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * GUI class for updating an Order from the Order table.
+ */
 public class UpdateOrderGUI {
     private JTextField clientIdTextField;
     private JTextField productIdTextField;
@@ -13,6 +16,9 @@ public class UpdateOrderGUI {
     private JFrame frame;
     private JPanel panel1;
 
+    /**
+     * Constructs the window for updating an order in the Order table.
+     */
     public UpdateOrderGUI() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -28,7 +34,12 @@ public class UpdateOrderGUI {
         frame.setVisible(true);
     }
 
-    public List<JTextField> getTextFields () {
+    /**
+     * TextFields getter that places all the TextFields in a list.
+     *
+     * @return List of JTextField
+     */
+    public List<JTextField> getTextFields() {
         ArrayList<JTextField> textFields = new ArrayList<>();
         textFields.add(orderIdTextField);
         textFields.add(clientIdTextField);

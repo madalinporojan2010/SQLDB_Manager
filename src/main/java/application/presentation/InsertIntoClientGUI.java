@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * GUI class for inserting into Client table.
+ */
 public class InsertIntoClientGUI {
     private JButton executeButton;
     private JTextField phoneTextField;
@@ -22,6 +25,9 @@ public class InsertIntoClientGUI {
     private JFrame frame;
 
 
+    /**
+     * Constructs the window for inserting in the client table.
+     */
     public InsertIntoClientGUI() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -37,6 +43,11 @@ public class InsertIntoClientGUI {
         frame.setVisible(true);
     }
 
+    /**
+     * TextFields getter that places all the TextFields in a list.
+     *
+     * @return List of JTextField
+     */
     public List<JTextField> getTextFields() {
         List<JTextField> textFields = new ArrayList<>();
         textFields.add(nameTextField);

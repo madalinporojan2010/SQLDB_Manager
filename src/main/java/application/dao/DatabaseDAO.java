@@ -20,7 +20,7 @@ public class DatabaseDAO extends AbstractDAO<BillData> {
      * @return The join query.
      */
     private String createJoinQuery() {
-        return "SELECT o.idOrder, c.idClient, c.name 'clientName', c.age, c.phone, c.address, c.email, p.idProduct, p.name 'productName', p.price, p.stock, o.ammount FROM werehousebd.client c JOIN werehousebd.order o ON (c.idClient = o.idClient) JOIN werehousebd.product p ON(o.idProduct = p.idProduct) ORDER BY o.idOrder";
+        return "SELECT o.idOrder, c.idClient, c.name 'clientName', c.age, c.phone, c.address, c.email, p.idProduct, p.name 'productName', p.price, p.stock, o.amount FROM werehousebd.client c JOIN werehousebd.order o ON (c.idClient = o.idClient) JOIN werehousebd.product p ON(o.idProduct = p.idProduct) ORDER BY o.idOrder";
     }
 
     /**

@@ -5,6 +5,9 @@ import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The main GUI class for CRUD and order operations on the tables.
+ */
 public class MainGUI {
     private JTable clientTable;
     private JTable productTable;
@@ -28,7 +31,9 @@ public class MainGUI {
     private DefaultTableModel productTableModel;
     private DefaultTableModel orderTableModel;
 
-
+    /**
+     * Constructs the window for order and CRUD operations on the tables. It initialises the corresponding data to the JTable models.
+     */
     public MainGUI() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -67,6 +72,11 @@ public class MainGUI {
         orderTable.setModel(orderTableModel);
     }
 
+    /**
+     * Tables getter that places all the JTables in a list.
+     *
+     * @return List of JTables
+     */
     public List<JTable> getTables() {
         List<JTable> tables = new ArrayList<>();
         tables.add(clientTable);

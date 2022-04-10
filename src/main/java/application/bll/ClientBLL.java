@@ -25,7 +25,6 @@ public class ClientBLL {
         validators.add(new ClientNameValidator());
         validators.add(new ClientAgeValidator());
         validators.add(new PhoneValidator());
-        validators.add(new AddressValidator());
         validators.add(new EmailValidator());
         clientDAO = new ClientDAO();
     }

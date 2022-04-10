@@ -16,7 +16,7 @@ public class AmountValidator implements Validator<Order> {
      */
     public void validate(Order t) {
 
-        if (t.getAmmount() <= 0) {
+        if (t.getAmount() <= 0) {
             throw new IllegalArgumentException("The amount limit is not respected!");
         }
 

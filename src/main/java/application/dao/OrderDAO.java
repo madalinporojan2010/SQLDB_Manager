@@ -56,11 +56,11 @@ public class OrderDAO extends AbstractDAO<Order> {
             statement = connection.prepareStatement(query);
 
             if (operation == Operation.DELETE) {
-                statement.setInt(1, new ProductDAO().findById(this.findById(id).getIdProduct()).getStock() + this.findById(id).getAmmount());
+                statement.setInt(1, new ProductDAO().findById(this.findById(id).getIdProduct()).getStock() + this.findById(id).getAmount());
             } else if (operation == Operation.INSERT) {
-                statement.setInt(1, new ProductDAO().findById(this.findById(id).getIdProduct()).getStock() - this.findById(id).getAmmount());
+                statement.setInt(1, new ProductDAO().findById(this.findById(id).getIdProduct()).getStock() - this.findById(id).getAmount());
             } else if (operation == Operation.UPDATE) {
-                statement.setInt(1, new ProductDAO().findById(this.findById(id).getIdProduct()).getStock() + (this.findById(id).getAmmount() - updatedOrder.getAmmount()));
+                statement.setInt(1, new ProductDAO().findById(this.findById(id).getIdProduct()).getStock() + (this.findById(id).getAmount() - updatedOrder.getAmount()));
             }
             statement.setInt(2, this.findById(id).getIdProduct());
             statement.executeUpdate();
@@ -90,7 +90,7 @@ public class OrderDAO extends AbstractDAO<Order> {
      * @return The inserted order.
      */
     public Order insert(Order order) {
-        if (order.getAmmount() <= new ProductBLL().findProductById(order.getIdProduct()).getStock()) {
+        if (order.getAmount() <= new ProductBLL().findProductById(order.getIdProduct()).getStock()) {
             Order insertedOrder = super.insert(order);
             updateStock(order.getIdOrder(), Operation.INSERT, null);
             return insertedOrder;
@@ -105,7 +105,7 @@ public class OrderDAO extends AbstractDAO<Order> {
      * @return The updated order.
      */
     public Order update(Order order) {
-        int amountDiff = this.findById(order.getIdOrder()).getAmmount() - order.getAmmount();
+        int amountDiff = this.findById(order.getIdOrder()).getAmount() - order.getAmount();
         if (amountDiff < 0 && Math.abs(amountDiff) > new ProductDAO().findById(order.getIdProduct()).getStock()) {
             return null;
         }
