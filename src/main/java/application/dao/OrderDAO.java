@@ -11,6 +11,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
+/**
+ * A Order Data Access Object that extends the AbstractDAO generic class.
+ */
 public class OrderDAO extends AbstractDAO<Order> {
     private enum Operation {
         DELETE, INSERT, UPDATE

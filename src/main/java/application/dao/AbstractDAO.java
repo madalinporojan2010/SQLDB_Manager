@@ -16,6 +16,11 @@ import application.connection.ConnectionFactory;
 
 import javax.swing.*;
 
+/**
+ * Class used to create the database CRUD operations for any db table.
+ *
+ * @param <T> Generic Class parameter.
+ */
 public class AbstractDAO<T> {
     protected static final Logger LOGGER = Logger.getLogger(AbstractDAO.class.getName());
 
@@ -23,12 +28,18 @@ public class AbstractDAO<T> {
 
     private static int nextIdInTable = 1;
 
+    /**
+     * The AbstractDAO class constructor that instantiates the Type of the class and sets the next available id in the table.
+     */
     @SuppressWarnings("unchecked")
     public AbstractDAO() {
         this.type = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
         setNextIdInTable();
     }
 
+    /**
+     * Sets the next available id in the table.
+     */
     public void setNextIdInTable() {
         List<T> objects = findAll();
         int freeID = 0;
@@ -50,10 +61,21 @@ public class AbstractDAO<T> {
         nextIdInTable = freeID;
     }
 
+    /**
+     * The NextId getter.
+     *
+     * @return The available id.
+     */
     public int getNextIdInTable() {
         return nextIdInTable;
     }
 
+    /**
+     * Creates the select query for the generic model. The parameter is given to the WHERE sql statement.
+     *
+     * @param field The column of the WHERE sql statement.
+     * @return The select query.
+     */
     private String createSelectQuery(String field) {
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT ");
@@ -64,6 +86,11 @@ public class AbstractDAO<T> {
         return sb.toString();
     }
 
+    /**
+     * Creates an insert query for the generic model.
+     *
+     * @return The insert query.
+     */
     private String createInsertQuery() {
         StringBuilder sb = new StringBuilder();
         sb.append(" INSERT ");
@@ -80,6 +107,11 @@ public class AbstractDAO<T> {
         return sb.toString();
     }
 
+    /**
+     * Creates an update query for the generic model.
+     *
+     * @return The update query.
+     */
     private String createUpdateQuery() {
         StringBuilder sb = new StringBuilder();
         sb.append(" UPDATE ");
@@ -93,6 +125,11 @@ public class AbstractDAO<T> {
         return sb.toString();
     }
 
+    /**
+     * Creates a delete query for the generic model.
+     *
+     * @return The delete query.
+     */
     private String createDeleteQuery() {
         StringBuilder sb = new StringBuilder();
         sb.append(" DELETE ");
@@ -103,6 +140,11 @@ public class AbstractDAO<T> {
         return sb.toString();
     }
 
+    /**
+     * Finds all the entries in the database for this model.
+     *
+     * @return A List of generic models.
+     */
     public List<T> findAll() {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -124,6 +166,12 @@ public class AbstractDAO<T> {
         return null;
     }
 
+    /**
+     * Finds the generic model at the given id and returns it.
+     *
+     * @param id The id to be found in the model.
+     * @return A generic object found at the respective id.
+     */
     public T findById(int id) {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -146,6 +194,12 @@ public class AbstractDAO<T> {
         return null;
     }
 
+    /**
+     * Creates the respective objects from the ResultSet of the query.
+     *
+     * @param resultSet The database query results.
+     * @return A list of generic objects.
+     */
     protected List<T> createObjects(ResultSet resultSet) {
         List<T> list = new ArrayList<T>();
         Constructor[] ctors = type.getDeclaredConstructors();
@@ -174,6 +228,12 @@ public class AbstractDAO<T> {
         return list;
     }
 
+    /**
+     * Inserts an object in the respective table.
+     *
+     * @param t Generic object to be inserted.
+     * @return The inserted object.
+     */
     public T insert(T t) {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -212,6 +272,12 @@ public class AbstractDAO<T> {
         return t;
     }
 
+    /**
+     * Updates an object in the respective table.
+     *
+     * @param t Generic object to be updated.
+     * @return The updated object.
+     */
     public T update(T t) {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -223,7 +289,7 @@ public class AbstractDAO<T> {
             int paramIndex = 1;
             for (Field field : t.getClass().getDeclaredFields()) {
                 field.setAccessible(true);
-                if(paramIndex == 1) {
+                if (paramIndex == 1) {
                     statement.setObject(t.getClass().getDeclaredFields().length + 1, field.get(t));
                 }
                 statement.setObject(paramIndex, field.get(t));
@@ -240,6 +306,12 @@ public class AbstractDAO<T> {
         return t;
     }
 
+    /**
+     * Deleted the object from the respective table, at the given id.
+     *
+     * @param id The id where the deletion will take place.
+     * @return TRUE - if the deletion was successful FALSE - if the deletion could not be made.
+     */
     public boolean deleteById(int id) {
         if (findById(id) != null) {
             Connection connection = null;
@@ -262,7 +334,4 @@ public class AbstractDAO<T> {
         } else
             return false;
     }
-    //DELETE FROM `werehousebd`.`client` WHERE (`idClient` = '2');
-
-    //SELECT * FROM werehousebd.order o JOIN werehousebd.product p ON (o.idProduct = p.idProduct) JOIN werehousebd.client c ON(c.idClient = o.idClient) ORDER BY c.idClient;
 }
