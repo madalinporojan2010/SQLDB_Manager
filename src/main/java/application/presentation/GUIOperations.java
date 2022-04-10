@@ -171,9 +171,8 @@ public class GUIOperations {
      * @param classBLL   Generic class that corresponds to the Business Layer.
      * @param classModel Generic class that corresponds to the model.
      * @param textFields The Text fields corresponding to the respective generic class.
-     * @throws Exception Stating that the object was not inserted successfully.
      */
-    public static void insertObject(Class classBLL, Class classModel, List<JTextField> textFields) throws Exception {
+    public static void insertObject(Class classBLL, Class classModel, List<JTextField> textFields) {
         Object object = setObjectProprieties(classModel, textFields);
         Object classBLLObject = null;
         try {

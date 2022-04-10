@@ -39,7 +39,7 @@ CREATE TABLE `client` (
 
 LOCK TABLES `client` WRITE;
 /*!40000 ALTER TABLE `client` DISABLE KEYS */;
-INSERT INTO `client` VALUES (0,'Madalin',21,'0746225087','Cluj-Napoca','madalin.porojan2000@gmail.com'),(1,'Radu',20,'0728846674','Cluj-Napoca','radu.oltean@yahoo.com'),(2,'Mircea',18,'0734856457','Tg. Mures','mircea.mihai@didatec.utcluj.ro');
+INSERT INTO `client` VALUES (0,'Madalin',21,'0746225087','Cluj-Napoca','madalin.porojan2000@gmail.com'),(1,'Radu',22,'0728846674','Cluj-Napoca','radu.oltean@yahoo.com'),(2,'Mircea',20,'0734856457','Bucuresti','mircea.mihai@didatec.utcluj.ro');
 /*!40000 ALTER TABLE `client` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -52,4 +52,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-04-10 13:15:20
+-- Dump completed on 2022-04-10 20:54:52

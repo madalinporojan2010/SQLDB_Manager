@@ -37,7 +37,7 @@ CREATE TABLE `product` (
 
 LOCK TABLES `product` WRITE;
 /*!40000 ALTER TABLE `product` DISABLE KEYS */;
-INSERT INTO `product` VALUES (0,'Birou',100,48),(1,'Lampa',10,100),(2,'Perna',20,100),(3,'Scaun',5,380),(4,'Raft',30,56);
+INSERT INTO `product` VALUES (0,'Birou',100,48),(1,'Lampa',10,100),(2,'Perna',20,80),(3,'Scaun',5,380),(4,'Raft',30,56);
 /*!40000 ALTER TABLE `product` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -50,4 +50,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-04-10 13:15:21
+-- Dump completed on 2022-04-10 20:54:52
